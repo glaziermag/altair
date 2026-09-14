@@ -1,4 +1,4 @@
-name: Tests (repro-a upstream)
+name: Tests (repro-c doctests)
 
 on:
   workflow_dispatch:
@@ -82,7 +82,7 @@ jobs:
           fi
       - name: Test with pytest
         run: |
-          uv run pytest --pyargs --numprocesses=logical --doctest-modules --doctest-ignore-import-errors tests
+          uv run pytest --pyargs --numprocesses=logical --doctest-modules --doctest-ignore-import-errors tests altair tools
       - name: Validate Vega-Lite schema
         run: |
           # We install all 'format' dependencies of jsonschema as check-jsonschema
