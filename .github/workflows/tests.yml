@@ -1,6 +1,7 @@
-name: Tests
+name: Tests (repro-a upstream)
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
