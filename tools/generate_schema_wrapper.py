@@ -20,7 +20,6 @@ if sys.version_info >= (3, 15):
 else:
     from typing_extensions import TypedDict
 
-import vl_convert as vlc
 
 sys.path.insert(0, str(Path.cwd()))
 
@@ -587,6 +586,8 @@ def _vega_lite_props_only(
 def update_vega_themes(fp: Path, /, indent: str | int | None = 2) -> None:
     root = load_schema(fp.parent / SCHEMA_FILE)
     vl_props = SchemaInfo.from_refname("Config", root).properties
+    import vl_convert as vlc
+
     themes = dict(_vega_lite_props_only(vlc.get_themes(), vl_props))
     data = json.dumps(themes, indent=indent, sort_keys=True)
     fp.write_text(data, encoding="utf8")

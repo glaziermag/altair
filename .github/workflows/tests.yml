@@ -1,4 +1,4 @@
-name: Tests (repro-b re-uninstall)
+name: Tests (repro-d full fix)
 
 on:
   workflow_dispatch:
