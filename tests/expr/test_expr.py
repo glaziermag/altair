@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import datetime as dt
 import operator
-import sys
 from inspect import classify_class_attrs, getmembers, signature
 from typing import TYPE_CHECKING, Any, TypeVar, cast
 
@@ -10,7 +9,7 @@ import numpy as np
 import pytest
 from jsonschema.exceptions import ValidationError
 
-from altair import datum, expr, ExprRef
+from altair import datum, expr, ExprRef, param
 from altair.expr import _ExprMeta
 from altair.expr.core import Expression, GetAttrExpression
 
@@ -126,10 +125,7 @@ def test_expr_consts(constname: str):
 @pytest.mark.parametrize("constname", _get_property_names(_ExprMeta))
 def test_expr_consts_immutable(constname: str):
     """Ensure e.g `alt.expr.PI = 2` is prevented."""
-    if sys.version_info >= (3, 11):
-        pattern = f"property {constname!r}.+has no setter"
-    else:
-        pattern = f"can't set attribute {constname!r}"
+    pattern = f"property {constname!r}.+has no setter"
     with pytest.raises(AttributeError, match=pattern):
         setattr(expr, constname, 2)
 
@@ -160,6 +156,18 @@ def test_datum_getattr():
     magic_attr = "__magic__"
     with pytest.raises(AttributeError):
         getattr(datum, magic_attr)
+
+
+def test_datum_getitem_param():
+    """datum[param] should use the bare signal name, not a quoted string."""
+    p = param(name="xcol", value="Horsepower")
+    assert repr(datum[p]) == "datum[xcol]"
+
+    # String key should still be quoted (field name literal, not a signal)
+    assert repr(datum["Horsepower"]) == "datum['Horsepower']"
+
+    # Works inside a compound expression
+    assert repr(datum[p] > 100) == "(datum[xcol] > 100)"
 
 
 def test_expression_getitem():
@@ -198,7 +206,7 @@ def test_expression_function_nostring():
         (dt.datetime(2000, 1, 1), "datetime(2000,0,1,0,0,0,0)"),
         (dt.datetime(2001, 1, 1, 9, 30, 0, 2999), "datetime(2001,0,1,9,30,0,2)"),
         (
-            dt.datetime(2003, 5, 1, 1, 30, tzinfo=dt.timezone.utc),
+            dt.datetime(2003, 5, 1, 1, 30, tzinfo=dt.UTC),
             "utc(2003,4,1,1,30,0,0)",
         ),
     ],
