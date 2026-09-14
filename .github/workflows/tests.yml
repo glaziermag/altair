@@ -1,4 +1,4 @@
-name: Tests (repro-a upstream)
+name: Tests (repro-e ci+tests fix)
 
 on:
   workflow_dispatch:
@@ -80,6 +80,9 @@ jobs:
               git diff
               exit 1
           fi
+      - name: Uninstall vl-convert-python again (only needed for schema generation)
+        if: ${{ matrix.python-version == '3.11' }}
+        run: uv pip uninstall vl-convert-python
       - name: Test with pytest
         run: |
           uv run pytest --pyargs --numprocesses=logical --doctest-modules --doctest-ignore-import-errors tests
